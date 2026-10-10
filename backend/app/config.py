@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     llm_base_url: str = ""
     llm_model: str = ""
 
+    # 允许跨域访问的前端来源,逗号分隔;部署后把线上前端域名加进来
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
     weather_cache_ttl_seconds: int = 1800
     guide_cache_ttl_seconds: int = 3600
     # 流式调用下这是「块间超时」:两次 token 之间的最大等待,而非整个响应的时限

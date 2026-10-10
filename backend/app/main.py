@@ -18,11 +18,13 @@ async def lifespan(app: FastAPI):
     await app.state.http.aclose()
 
 
-app = FastAPI(title="Traveller 旅行攻略", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="出逃计划 · 天气旅行推荐", version="0.1.0", lifespan=lifespan)
 
+# 允许跨域的前端来源:默认本地开发,线上通过 CORS_ORIGINS 环境变量配置(逗号分隔)
+_cors_origins = [o.strip() for o in get_settings().cors_origins.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=_cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

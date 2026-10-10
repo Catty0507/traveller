@@ -7,6 +7,10 @@ import type {
   Tag,
 } from "./types";
 
+// 后端 API 地址:本地开发留空(走 Vite 代理 /api → localhost:8000);
+// 部署后通过 VITE_API_BASE 指向后端服务地址(如 https://your-backend.onrender.com,不带末尾斜杠)
+const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/+$/, "") ?? "";
+
 export class ApiError extends Error {
   status: number;
 
@@ -19,7 +23,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(path, init);
+    res = await fetch(`${API_BASE}${path}`, init);
   } catch {
     throw new ApiError("网络异常,请确认后端服务已启动(端口 8000)", 0);
   }

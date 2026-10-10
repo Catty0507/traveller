@@ -51,6 +51,27 @@ make frontend
 
 打开 <http://localhost:5173> 即可使用。
 
+## 部署上线(Render + 静态托管)
+
+### 后端(Render Web Service)
+
+1. 新建 Web Service 连接仓库,**Root Directory** 填 `backend`
+2. **Build Command**:`pip install -r requirements.txt`
+3. **Start Command**:`uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers`
+4. **Health Check Path**:`/api/health`
+5. **环境变量**(在 Render 控制台配置,线上值会覆盖本地 .env):
+
+   | 变量 | 说明 |
+   |---|---|
+   | `PYTHON_VERSION` | `3.12` |
+   | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | 同本地 `.env` |
+   | `CORS_ORIGINS` | 线上前端域名,逗号分隔,如 `https://your-frontend.vercel.app` |
+
+### 前端(静态站点)
+
+1. 构建命令 `npm run build`,发布目录 `dist`(Vercel / Render Static Site / Cloudflare Pages 均可)
+2. 环境变量 `VITE_API_BASE=https://你的后端域名`(不带末尾斜杠;留空则请求同域 `/api`)
+
 ## 使用方式
 
 - **选择想去的地方**:多选候选城市(如 杭州/成都/巴黎),系统结合天气挑选最值得去的 1-3 个
