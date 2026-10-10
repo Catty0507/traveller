@@ -25,6 +25,10 @@ const POPULAR_IDS = [
   "paris",
 ];
 
+// 远程搜索选中的城市对象缓存:清空搜索框后结果列表会被重置,
+// 没有这份缓存,已选中的动态城市(如阿勒泰市)会因查不到而从已选区消失
+const dynamicCities = new Map<string, City>();
+
 export default function CityTab({ cities, selected, onToggle }: Props) {
   const [query, setQuery] = useState("");
   const [remote, setRemote] = useState<City[] | null>(null); // null = 未在远程搜索(本地热门模式)
@@ -60,6 +64,7 @@ export default function CityTab({ cities, selected, onToggle }: Props) {
   const known = useMemo(() => {
     const m = new Map(cities.map((c) => [c.id, c]));
     (remote ?? []).forEach((c) => m.set(c.id, c));
+    dynamicCities.forEach((c) => m.set(c.id, c));
     return m;
   }, [cities, remote]);
   const selectedCities = selected.map((id) => known.get(id)).filter((c): c is City => Boolean(c));
@@ -96,7 +101,11 @@ export default function CityTab({ cities, selected, onToggle }: Props) {
       <button
         key={city.id}
         type="button"
-        onClick={() => onToggle(city.id)}
+        onClick={() => {
+          dynamicCities.set(city.id, city); // 先记住城市对象,再交给父组件切换选中态
+          onToggle(city.id);
+          if (query) setQuery(""); // 选中后自动清空搜索框,回到热门精选
+        }}
         className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
           isSelected
             ? "bg-sky-600 text-white border-sky-600"

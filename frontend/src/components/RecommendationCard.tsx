@@ -1,16 +1,31 @@
 import type { Recommendation } from "../api/types";
 import { coverGradient, primaryTagEmoji } from "../constants/colors";
-import type { GuideState } from "../hooks/useRecommend";
+import type { DriveState, GuideState } from "../hooks/useRecommend";
+import DriveSection from "./DriveSection";
 import GuideSection from "./GuideSection";
 import WeatherStrip from "./WeatherStrip";
 
 interface Props {
   rec: Recommendation;
   guide: GuideState | undefined;
+  drive: DriveState | undefined;
+  hasOrigin: boolean;
   onRetryGuide: () => void;
+  onRequestDrive: () => void;
+  onRetryDrive: () => void;
+  onCancelDrive: () => void;
 }
 
-export default function RecommendationCard({ rec, guide, onRetryGuide }: Props) {
+export default function RecommendationCard({
+  rec,
+  guide,
+  drive,
+  hasOrigin,
+  onRetryGuide,
+  onRequestDrive,
+  onRetryDrive,
+  onCancelDrive,
+}: Props) {
   const { city, weather } = rec;
 
   // 行程区间是窗口内安排的一段(按城市建议天数),与建议天数对比着说
@@ -22,6 +37,12 @@ export default function RecommendationCard({ rec, guide, onRetryGuide }: Props) 
       : tripDays > city.suggested_days
         ? `安排 ${tripDays} 天,玩得更从容`
         : `建议 ${city.suggested_days} 天,这趟安排 ${tripDays} 天更紧凑`;
+
+  // 自驾方案覆盖整个时间窗口,与原攻略互斥:展示自驾时收起原攻略;租车建议则是补充,两者共存
+  const driveActive = drive?.status === "done" && drive.data!.plan.mode === "drive";
+  const rentalShown = drive?.status === "done" && drive.data!.plan.mode === "rental";
+  const driveBusy = drive?.status === "loading";
+  const toggleOff = driveActive || rentalShown;
 
   return (
     <article className="overflow-hidden rounded-3xl bg-white shadow-md shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow hover:shadow-lg hover:shadow-slate-900/5">
@@ -79,12 +100,47 @@ export default function RecommendationCard({ rec, guide, onRetryGuide }: Props) 
           </div>
         )}
 
-        <div className="border-t border-slate-100 pt-5">
-          <h4 className="mb-3 text-sm font-semibold text-slate-700">
-            ✈️ {city.name_zh} 攻略
-          </h4>
-          <GuideSection state={guide} cityName={city.name_zh} onRetry={onRetryGuide} />
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleOff ? onCancelDrive : onRequestDrive}
+            disabled={!hasOrigin || driveBusy}
+            title={
+              !hasOrigin
+                ? "先在上方设置「出发地」,重新推荐后即可规划自驾"
+                : driveActive
+                  ? "取消自驾模式,恢复原来的行程攻略"
+                  : "规划从出发地出发的自驾方案"
+            }
+            className={
+              toggleOff
+                ? "inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                : "inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-1.5 text-sm font-semibold text-white shadow-sm shadow-sky-600/20 transition-transform hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            }
+          >
+            {driveBusy ? "规划中…" : driveActive ? "↩️ 取消自驾,恢复原方案" : rentalShown ? "收起租车建议" : "🚗 我要自驾"}
+          </button>
+          <span className="text-xs text-slate-400">
+            {!hasOrigin
+              ? "先在上方设置「出发地」,重新推荐后即可规划自驾"
+              : driveActive
+                ? "已切换为自驾方案,原攻略暂时收起"
+                : rentalShown
+                  ? "自驾时间不够,原方案保留,租车建议附在下方"
+                  : "从出发地一路玩过去;时间不够就改当地租车"}
+          </span>
         </div>
+
+        <DriveSection state={drive} cityName={city.name_zh} onRetry={onRetryDrive} />
+
+        {!driveActive && (
+          <div className="border-t border-slate-100 pt-5">
+            <h4 className="mb-3 text-sm font-semibold text-slate-700">
+              ✈️ {city.name_zh} 攻略
+            </h4>
+            <GuideSection state={guide} cityName={city.name_zh} onRetry={onRetryGuide} />
+          </div>
+        )}
       </div>
     </article>
   );

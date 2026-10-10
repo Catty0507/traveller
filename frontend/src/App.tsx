@@ -74,7 +74,12 @@ export default function App() {
               recommendations={rec.recommendations}
               note={rec.note}
               guides={rec.guides}
+              drives={rec.drives}
+              hasOrigin={rec.hasOrigin}
               onRetryGuide={rec.retryGuide}
+              onRequestDrive={rec.requestDrive}
+              onRetryDrive={rec.retryDrive}
+              onCancelDrive={rec.cancelDrive}
             />
           )}
         </div>

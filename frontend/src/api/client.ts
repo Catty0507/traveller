@@ -1,5 +1,7 @@
 import type {
   City,
+  DriveRequestBody,
+  DriveResponse,
   GuideRequestBody,
   GuideResponse,
   RecommendRequestBody,
@@ -55,6 +57,12 @@ export const api = {
     }),
   guide: (body: GuideRequestBody) =>
     request<GuideResponse>("/api/guide", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+  drive: (body: DriveRequestBody) =>
+    request<DriveResponse>("/api/drive", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

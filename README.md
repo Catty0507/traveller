@@ -94,6 +94,7 @@ make test
 | GET | /api/tags | 偏好标签 |
 | POST | /api/recommend | 天气 + LLM 推荐 1-3 个目的地 |
 | POST | /api/guide | 单城市 AI 攻略(前端并行调用) |
+| POST | /api/drive | 自驾规划:时间充裕给往返自驾玩法,时间不足改推目的地租车 |
 | GET | /api/health | 健康检查(含 llm_configured) |
 
 ## 项目结构

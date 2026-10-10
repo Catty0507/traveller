@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.routers import cities, guide, recommend
+from app.routers import cities, drive, guide, recommend
 from app.services import llm_client
 
 
@@ -32,6 +32,7 @@ app.add_middleware(
 app.include_router(cities.router)
 app.include_router(recommend.router)
 app.include_router(guide.router)
+app.include_router(drive.router)
 
 
 @app.exception_handler(RequestValidationError)

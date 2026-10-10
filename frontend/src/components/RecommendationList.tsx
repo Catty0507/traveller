@@ -1,19 +1,29 @@
 import type { Recommendation } from "../api/types";
-import type { GuideState } from "../hooks/useRecommend";
+import type { DriveState, GuideState } from "../hooks/useRecommend";
 import RecommendationCard from "./RecommendationCard";
 
 interface Props {
   recommendations: Recommendation[];
   note: string | null;
   guides: Record<string, GuideState>;
+  drives: Record<string, DriveState>;
+  hasOrigin: boolean;
   onRetryGuide: (cityId: string) => void;
+  onRequestDrive: (cityId: string) => void;
+  onRetryDrive: (cityId: string) => void;
+  onCancelDrive: (cityId: string) => void;
 }
 
 export default function RecommendationList({
   recommendations,
   note,
   guides,
+  drives,
+  hasOrigin,
   onRetryGuide,
+  onRequestDrive,
+  onRetryDrive,
+  onCancelDrive,
 }: Props) {
   return (
     <section className="space-y-6">
@@ -27,7 +37,12 @@ export default function RecommendationList({
           key={rec.city.id}
           rec={rec}
           guide={guides[rec.city.id]}
+          drive={drives[rec.city.id]}
+          hasOrigin={hasOrigin}
           onRetryGuide={() => onRetryGuide(rec.city.id)}
+          onRequestDrive={() => onRequestDrive(rec.city.id)}
+          onRetryDrive={() => onRetryDrive(rec.city.id)}
+          onCancelDrive={() => onCancelDrive(rec.city.id)}
         />
       ))}
     </section>

@@ -121,3 +121,56 @@ export interface GuideResponse {
   weather_brief: string;
   guide: GuideData;
 }
+
+// ---- 自驾规划 ----
+
+export interface RouteLeg {
+  title: string;
+  desc: string;
+}
+
+export interface Rental {
+  name: string;
+  desc: string;
+}
+
+export interface DriveTipItem {
+  category: string;
+  text: string;
+}
+
+export interface DrivePlanData {
+  mode: "drive" | "rental";
+  summary: string;
+  total_km?: number | null;
+  total_drive_hours?: number | null;
+  depart_date?: string | null;
+  return_date?: string | null;
+  route: RouteLeg[];
+  daily_plan: DayPlan[];
+  rentals: Rental[];
+  tips: DriveTipItem[];
+}
+
+export interface DriveRequestBody {
+  city_id: string;
+  start_date: string; // 用户空闲时间窗口
+  end_date: string;
+  trip_start?: string; // 原计划游玩区间,仅供规划参考
+  trip_end?: string;
+  origin: Origin;
+  user_tags?: string[];
+}
+
+export interface DriveResponse {
+  city_id: string;
+  city_name_zh: string;
+  origin_name: string;
+  start_date: string;
+  end_date: string;
+  distance_km: number; // 出发地到目的地的直线距离
+  est_drive_km: number; // 估算单程公路里程
+  est_drive_hours: number; // 估算单程纯驾驶小时
+  weather_brief: string;
+  plan: DrivePlanData;
+}
